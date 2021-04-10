@@ -16,7 +16,7 @@
           <el-input type="password" v-model="loginForm.password" prefix-icon="el-icon-key"></el-input>
         </el-form-item>
 
-        <el-form-item class="btns">
+        <el-form-item class="btn">
           <el-button type="primary" @click="login">登录</el-button>
           <el-button type="info" @click="resetLoginForm">重置</el-button>
         </el-form-item>
@@ -105,7 +105,7 @@ export  default {
   border-radius: 50%;
   background-color: #eee;
 }
-.btns{
+.btn{
   display: flex;
 
 }
