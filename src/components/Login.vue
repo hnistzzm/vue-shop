@@ -30,12 +30,12 @@ export  default {
   data(){
     return{
       loginForm:{
-        username:"",
-        password:""
+        username:"admin",
+        password:"123456"
       },
       loginFormRules:{
         username:[
-          { required: true, message: '请输入账号', trigger: 'blur'},
+          { required: true, message: '请输入账号', trigger: 'blur'},//blur 鼠标焦点事件
           {min: 3, max: 10, message: '长度在 3 到 10 个字符', trigger: 'blur'}
           ],
         //验证账号和密码是否合法
@@ -52,9 +52,19 @@ export  default {
       this.$refs.loginFormRef.resetFields();
     },
     login(){
-      this.$refs.loginFormRef.validate(valid=>{
-        console.log(valid);
-      })
+      //axios发送客户端请求
+      this.$refs.loginFormRef.validate(async valid=>{
+        if(!valid) return;
+       const {data:res }=await this.$http.post("login",this.loginForm);
+
+       //判断登录是否成功并弹出提示框
+       if(res.meta.status!==200) return this.$message.error("登陆失败");
+        this.$message.success("登陆成功");
+       //alert("登陆成功");
+      window.sessionStorage.setItem('token',res.data.token);
+      await this.$router.push('/home');
+
+      });
     }
   }
 
