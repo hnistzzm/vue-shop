@@ -4,7 +4,7 @@
     <el-header>
       <div>
         <img src="../assets/heima.png" alt="">
-      <span>用户管理系统</span>
+      <span>电商后台管理系统</span>
       </div>
       <!--  点击”退出“按钮,将token删除，使用户页面跳转至登录页面-->
       <el-button type="info" @click="logout">退出</el-button>
@@ -135,7 +135,8 @@ data(){
 
 }
 .el_main{
-  background-color: #eaedf1;
+ background-color: #cb2020;
+
 }
 .iconfont{
   margin-right: 10px;
