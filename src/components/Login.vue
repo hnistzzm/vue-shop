@@ -72,8 +72,11 @@ export  default {
 </script>
 <style Lang="less" scoped>
 .login_container{
-  background-color: #aea9c8;
+
   height: 800px;
+  background-color: #0093E9;
+  background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 99%);
+
 }
 .login_box{
 
@@ -85,6 +88,7 @@ export  default {
   left: 50%;
   top: 50%;
   transform: translate(-50%,-50%);
+  opacity: 0.9;
 
 }
 .avatar_box{
