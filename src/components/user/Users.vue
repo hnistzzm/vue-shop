@@ -18,6 +18,23 @@
         <el-button type="primary">添加用户</el-button>
       </el-col>
     </el-row>
+<!--    用户列表区域-->
+    <el-table :data="userlist" border stripe>
+      <el-table-column type="index" label="#"></el-table-column>
+      <el-table-column label="姓名" prop="username"></el-table-column>
+      <el-table-column label="邮箱" prop="email"></el-table-column>
+      <el-table-column label="电话" prop="mobile"></el-table-column>
+      <el-table-column label="角色" prop="role_name"></el-table-column>
+      <el-table-column label="状态" >
+        <template  v-slot:default="scope">
+          <el-switch v-model="scope.row.mg_state">
+
+          </el-switch>
+        </template>
+
+      </el-table-column>
+      <el-table-column label="操作"></el-table-column>
+    </el-table>
   </el-card>
 </div>
 </template>
@@ -35,20 +52,26 @@ export default {
     },
       userlist:[],
       total:0
+
     }
+
   },
   created () {
     this.getUserList()
   },
   methods:{
     async getUserList(){
-      const {data:res} = await  this.$http.get('users', {
+     //await this.$http.get('users',{params:this.queryInfo })
+      const {data:res} = await this.$http.get('users', {
         params:this.queryInfo
         })
+      console.log(res)
       if(res.meta.status !== 200){
         return this.$message.error('获取用户列表失败！')
       }
-      this.userlist=res.data.userSelect
+
+
+      this.userlist=res.data.users
       this.total =res.data.total
       console.log(res)
 
