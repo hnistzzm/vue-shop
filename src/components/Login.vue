@@ -29,7 +29,7 @@ export default {
           <el-input type="password" v-model="loginForm.password" prefix-icon="el-icon-key"></el-input>
         </el-form-item>
 
-        <el-form-item class="btns">
+        <el-form-item class="btn">
           <el-button type="primary" @click="login">登录</el-button>
           <el-button type="info" @click="resetLoginForm">重置</el-button>
         </el-form-item>
@@ -85,8 +85,11 @@ export  default {
 </script>
 <style Lang="less" scoped>
 .login_container{
-  background-color: #aea9c8;
+
   height: 800px;
+  background-color: #0093E9;
+  background-image: linear-gradient(160deg, #0093E9 0%, #80D0C7 99%);
+
 }
 .login_box{
 
@@ -98,6 +101,7 @@ export  default {
   left: 50%;
   top: 50%;
   transform: translate(-50%,-50%);
+  opacity: 0.9;
 
 }
 .avatar_box{
@@ -118,7 +122,7 @@ export  default {
   border-radius: 50%;
   background-color: #eee;
 }
-.btns{
+.btn{
   display: flex;
 
 }

@@ -23,9 +23,16 @@ export default {
 </script>
 <style>
 <<<<<<< HEAD
+<<<<<<< HEAD
 #app {
 
 }
 =======
 >>>>>>> login
+=======
+html,body,#app{
+  margin: 0;
+  height: 100%;
+}
+>>>>>>> user
 </style>

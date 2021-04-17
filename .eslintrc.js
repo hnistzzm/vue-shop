@@ -5,11 +5,7 @@ module.exports = {
   },
   extends: [
     'plugin:vue/essential',
-<<<<<<< HEAD
-    //'@vue/standard'
-=======
     // '@vue/standard'
->>>>>>> login
   ],
   parserOptions: {
     parser: 'babel-eslint'
