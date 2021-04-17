@@ -19,7 +19,7 @@
       </el-col>
     </el-row>
 <!--    用户列表区域-->
-    <el-table :data="userlist" border stripe>
+    <el-table :data="userList" border stripe>
       <el-table-column type="index" label="#"></el-table-column>
       <el-table-column label="姓名" prop="username"></el-table-column>
       <el-table-column label="邮箱" prop="email"></el-table-column>
@@ -143,7 +143,7 @@ export default {
      pagenum:1,
      pagesize:2
     },
-      userlist:[],
+      userList:[],
       total:0,
       //控制添加用户对话框的显示与隐藏
       addDialogVisible:false,
@@ -201,7 +201,7 @@ export default {
       if(res.meta.status !== 200){
         return this.$message.error('获取用户列表失败！')
       }
-      this.userlist=res.data.users
+      this.userList=res.data.users
       this.total =res.data.total
       console.log(res)
     },
@@ -215,7 +215,7 @@ export default {
       if(res.meta.status !== 200){
         return this.$message.error('获取用户列表失败！')
       }
-      this.userlist=res.data.users
+      this.userList=res.data.users
       this.total =res.data.total
       console.log(res)
     },
