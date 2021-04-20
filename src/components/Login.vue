@@ -56,7 +56,7 @@ export  default {
       this.$refs.loginFormRef.validate(async valid=>{
         if(!valid) return;
        const {data:res }=await this.$http.post("login",this.loginForm);
-
+        console.log(res)
        //判断登录是否成功并弹出提示框
        if(res.meta.status!==200) return this.$message.error("登陆失败");
         this.$message.success("登陆成功");

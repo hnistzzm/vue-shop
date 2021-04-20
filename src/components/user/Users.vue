@@ -265,6 +265,7 @@ export default {
           email:this.editForm.email,
           mobile:this.editForm.mobile
         })
+        //console.log(this.editForm.id)
         if(res.meta.status!==200)
           this.$message.error('修改用户信息失败！')
         else
@@ -277,7 +278,7 @@ export default {
     //显示编辑用户的对话框
     async showEdit(id){
 
-      //console.log(id)
+      //console.log(this.editForm.id)
       const {data:res} = await this.$http.get("users/"+id)
       if(res.meta.status!==200)
         return this.$message.error('查询用户信息失败!')
