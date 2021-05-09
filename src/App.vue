@@ -1,38 +1,22 @@
 <template>
   <div id="app">
-<<<<<<< HEAD
-zz
+    <router-view></router-view>
   </div>
 </template>
 
 
+
+
 <script>
 export default {
-  name: 'app',
-
-=======
- <router-view></router-view>
-
-</div>
-</template>
-<script>
-export default {
-  name: 'app'
->>>>>>> login
+name: 'app'
 }
 </script>
 <style>
-<<<<<<< HEAD
-<<<<<<< HEAD
-#app {
-
-}
-=======
->>>>>>> login
-=======
 html,body,#app{
   margin: 0;
   height: 100%;
 }
->>>>>>> user
 </style>
+
+

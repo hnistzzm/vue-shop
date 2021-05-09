@@ -1,30 +1,17 @@
 <template>
-<<<<<<< HEAD
-
-</template>
-
-<script>
-export default {
-  name: 'Login'
-}
-</script>
-
-<style lang="less" scoped>
-
-=======
   <div class="login_container">
     <div class="login_box">
-<!--    头像区-->
-<div class="avatar_box">
-  <img src="../assets/logo.png" alt="">
-</div>
-<!--      登录表单区域-->
+      <!--    头像区-->
+      <div class="avatar_box">
+        <img src="../assets/logo.png" alt="">
+      </div>
+      <!--      登录表单区域-->
       <el-form ref="loginFormRef" :model="loginForm" :rules="loginFormRules" label-width="0" class="login_form">
-<!--        用户名-->
+        <!--        用户名-->
         <el-form-item prop="username">
           <el-input v-model="loginForm.username" prefix-icon="el-icon-user"></el-input>
         </el-form-item>
-<!--        密码-->
+        <!--        密码-->
         <el-form-item prop="password">
           <el-input type="password" v-model="loginForm.password" prefix-icon="el-icon-key"></el-input>
         </el-form-item>
@@ -36,7 +23,14 @@ export default {
       </el-form>
     </div>
   </div>
+
 </template>
+
+
+
+
+
+
 
 <script>
 export  default {
@@ -132,5 +126,5 @@ export  default {
   top: 60%;
   transform: translate(-50%,-50%);
 }
->>>>>>> login
+
 </style>
