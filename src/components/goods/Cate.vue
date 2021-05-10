@@ -10,7 +10,7 @@
   <el-card>
     <el-row>
       <!--  设置添加分类的列表  -->
-      <el-button type="primary">添加分类</el-button>
+      <el-button type="primary" @click="addDialogVisible = true">添加分类</el-button>
     </el-row>
 
 <!--    分类列表区域-->
@@ -24,6 +24,28 @@
     </tree-table>
 <!--    分页区-->
   </el-card>
+
+  <!--    添加角色的对话框-->
+  <el-dialog
+    title="添加用户"
+    :visible.sync="addDialogVisible"
+    width="30%"  >
+    <!--      内容主体区域-->
+    <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="70px">
+      <el-form-item label="角色名称" prop="roleName">
+        <el-input v-model="addForm.roleName"></el-input>
+      </el-form-item>
+      <el-form-item label="角色描述" prop="roleDesc">
+        <el-input v-model="addForm.roleDesc"></el-input>
+      </el-form-item>
+    </el-form>
+
+    <!--      底部区域-->
+    <span slot="footer" class="dialog-footer">
+    <el-button @click="addDialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="addUser">确 定</el-button>
+  </span>
+  </el-dialog>
 
 </div>
 </template>
@@ -55,7 +77,8 @@ export default {
           template:'isok'
         }
 
-      ]
+      ],
+      addDialogVisible: false
     }
   },
   created () {
