@@ -230,6 +230,7 @@ export default {
         return this.$message.error('获取用户列表失败！')
       }
       this.userList=res.data.users
+      console.log(this.userList)
       this.total =res.data.total
       console.log(res)
     },

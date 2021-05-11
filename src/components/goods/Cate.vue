@@ -10,42 +10,58 @@
   <el-card>
     <el-row>
       <!--  设置添加分类的列表  -->
-      <el-button type="primary" @click="addDialogVisible = true">添加分类</el-button>
+      <el-button type="primary" @click="showAddCateDialog">添加分类</el-button>
     </el-row>
 
 <!--    分类列表区域-->
-    <tree-table :data="cateList" :columns="columns"
+    <tree-table class="cateTable" :data="cateList" :columns="columns"
                 :selection-type="false" :expand-type="false"
                 show-index index-text="#" border>
+<!--      是否有效-->
           <template slot="isok" slot-scope="scope">
               <i class="el-icon-success" v-if="scope.row.cat_deleted === false" style="color: lightgreen"></i>
               <i class="el-icon-error" v-else  style="color: red"></i>
           </template>
+<!--      排序-->
+          <template slot="order" slot-scope="scope">
+            <el-tag  size="mini" v-if="scope.row.cat_level===0">一级</el-tag>
+            <el-tag type="success"  size="mini" v-else-if="scope.row.cat_level===1">二级</el-tag>
+            <el-tag type="warning"  size="mini" v-else>三级</el-tag>
+          </template>
+<!--      操作-->
+          <template slot="opt" >
+            <el-button type="primary" icon="el-icon-edit" size="mini">编辑</el-button>
+            <el-button type="danger" icon="el-icon-delete" size="mini">删除</el-button>
+          </template>
     </tree-table>
 <!--    分页区-->
+    <el-pagination
+      @size-change="handleSizeChange"
+      @current-change="handleCurrentChange"
+      :current-page="queryInfo.pagenum"
+      :page-sizes="[2,5,10,15]"
+      :page-size="queryInfo.pagesize"
+      layout="total, sizes, prev, pager, next, jumper"
+      :total="total">
+    </el-pagination>
   </el-card>
+    <el-dialog title="添加分类"
+     :visible.sync="addDialogVisible"
+     width="30%">
+<!--      内容主体区域-->
+      <el-form :model="addCateForm"
+               :rules="addCateFormRules"
+               ref="addCateFormRef">
+          <el-form-item label="分类名称: " prop="cat_name">
+              <el-input v-model="addCateForm.cat_name">
+              </el-input>
+          </el-form-item>
+          <el-form-item label="父级分类: " >
 
-  <!--    添加角色的对话框-->
-  <el-dialog
-    title="添加用户"
-    :visible.sync="addDialogVisible"
-    width="30%"  >
-    <!--      内容主体区域-->
-    <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="70px">
-      <el-form-item label="角色名称" prop="roleName">
-        <el-input v-model="addForm.roleName"></el-input>
-      </el-form-item>
-      <el-form-item label="角色描述" prop="roleDesc">
-        <el-input v-model="addForm.roleDesc"></el-input>
-      </el-form-item>
-    </el-form>
+          </el-form-item>
+      </el-form>
 
-    <!--      底部区域-->
-    <span slot="footer" class="dialog-footer">
-    <el-button @click="addDialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="addUser">确 定</el-button>
-  </span>
-  </el-dialog>
+    </el-dialog>
 
 </div>
 </template>
@@ -75,10 +91,37 @@ export default {
           //表示将当前列定位模板列
           type:'template',
           template:'isok'
+        },
+        {
+          label: '排序',
+          //表示将当前列定位模板列
+          type:'template',
+          template:'order'
+        },
+        {
+          label: '操作',
+          //表示将当前列定位模板列
+          type:'template',
+          template:'opt'
         }
 
       ],
-      addDialogVisible: false
+      addDialogVisible: false,
+      addCateForm:{
+        //将要添加的分类的名称
+        cat_name:'',
+        //父级分类的id,默认是0
+        cat_pid:0,
+        //分类的等级,默认要添加的是1级分类
+        cat_level:0
+      },
+      //父级分类的列表
+      parentCateList:[],
+      addCateFormRules:{
+        cat_name: [
+          {required:true,message:'请输入分类名称',trigger:'blur'}
+        ]
+      }
     }
   },
   created () {
@@ -97,11 +140,32 @@ export default {
       console.log(this.cateList)
       //为总数据条数赋值
         this.total = res.data.total
-    }
-  }
+    },
+    handleSizeChange(newSize){
+      this.queryInfo.pagesize = newSize
+      this.getCateList()
+    },
+    handleCurrentChange(newPage){
+      this.queryInfo.pagenum = newPage
+      this.getCateList()
+    },
+    showAddCateDialog(){
+      this.getParentCateList()
+      this.addDialogVisible = true
+    },
+    getParentCateList(){
+      const {data : res} = this.$http.get('categories',{params:{type:2}})
+      if(res.meta.status !==200)
+        return this.$message.error('获取父级分类失败!')
+      this.parentCateList = res.data
+    }}
+
 }
 </script>
 
 <style  Lang="less" scoped>
-
+.cateTable{
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
 </style>

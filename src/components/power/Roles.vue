@@ -155,7 +155,7 @@ export default {
         return this.$message.error('获取角色列表失败!')
       }
       this.roleList=res.data
-      //console.log(this.roleList.id)
+      console.log(this.roleList)
     },
     //关闭表单后，将表单里的内容清空
     addCloseDialog(){
