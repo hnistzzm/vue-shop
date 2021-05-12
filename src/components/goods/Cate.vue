@@ -57,7 +57,12 @@
               </el-input>
           </el-form-item>
           <el-form-item label="父级分类: " >
-
+            <el-cascader
+              v-model="value"
+              :options="parentCateList"
+              :props="CascaderProps"
+            @change="parentCateChanged">
+            </el-cascader>
           </el-form-item>
       </el-form>
 
@@ -121,7 +126,18 @@ export default {
         cat_name: [
           {required:true,message:'请输入分类名称',trigger:'blur'}
         ]
-      }
+      },
+      //指定级联选择器的配置对象
+      CascaderProps:{
+        value:'cat_id',
+        label:'cat_name',
+        children:'children',
+        expandTrigger: 'hover'
+      },
+      //选中的父级分类的id数组
+      selectedKeys:[]
+
+
     }
   },
   created () {
@@ -153,12 +169,16 @@ export default {
       this.getParentCateList()
       this.addDialogVisible = true
     },
-    getParentCateList(){
-      const {data : res} = this.$http.get('categories',{params:{type:2}})
+    async getParentCateList(){
+      const {data : res} = await this.$http.get('categories',{params:{type:2}})
       if(res.meta.status !==200)
         return this.$message.error('获取父级分类失败!')
       this.parentCateList = res.data
-    }}
+    }},
+  parentCateChanged()
+  {
+    console.log(this.selectedKeys)
+  }
 
 }
 </script>
