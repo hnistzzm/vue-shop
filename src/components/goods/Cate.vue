@@ -45,6 +45,8 @@
       :total="total">
     </el-pagination>
   </el-card>
+
+<!--  添加分类的表单-->
     <el-dialog title="添加分类"
      :visible.sync="addDialogVisible"
      width="30%">
@@ -58,13 +60,18 @@
           </el-form-item>
           <el-form-item label="父级分类: " >
             <el-cascader
-              v-model="value"
+              v-model="selectedKeys"
               :options="parentCateList"
               :props="CascaderProps"
-            @change="parentCateChanged">
+              @change="parentCateChanged()" clearable change-on-select>
             </el-cascader>
           </el-form-item>
       </el-form>
+      <!--      底部区域-->
+      <span slot="footer" class="dialog-footer">
+          <el-button @click="addDialogVisible = false">取 消</el-button>
+          <el-button type="primary">确 定</el-button>
+      </span>
 
     </el-dialog>
 
@@ -174,11 +181,28 @@ export default {
       if(res.meta.status !==200)
         return this.$message.error('获取父级分类失败!')
       this.parentCateList = res.data
-    }},
-  parentCateChanged()
-  {
-    console.log(this.selectedKeys)
-  }
+    },
+    parentCateChanged()
+    {
+      console.log(this.selectedKeys)
+      //如果 selectedKeys 数组中的length大于0，证明选中了父级分类
+      //反之，则没有选中任何父级分类
+      if(this.selectedKeys.length > 0){
+        //父类的id
+        this.addCateForm.cat_pid = this.selectedKeys[this.selectedKeys.length - 1]
+        //为当前分类的等级赋值
+        this.addCateForm.cat_level = this.selectedKeys.length
+        return
+      }else{
+        //父级分类的id
+        this.addCateForm.cat_pid = 0
+        //为当前分类的等级赋值
+        this.addCateForm.cat_level = 0
+
+      }
+    }
+    },
+
 
 }
 </script>
@@ -187,5 +211,8 @@ export default {
 .cateTable{
   margin-top: 15px;
   margin-bottom: 15px;
+}
+.el-cascader{
+  width: 100%;
 }
 </style>
