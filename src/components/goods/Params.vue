@@ -38,11 +38,11 @@
           <el-table-column type="index"></el-table-column>
           <el-table-column label="参数名称" prop="attr_name"></el-table-column>
           <el-table-column label="操作">
-            <template >
+            <template slot-scope="scope">
               <el-button type="primary" size="mini"
-                         icon="el-icon-edit">编辑</el-button>
+                         icon="el-icon-edit" @click="showEdit(scope.row.attr_id)">修改</el-button>
               <el-button type="danger" size="mini"
-                         icon="el-icon-delete">删除</el-button>
+                         icon="el-icon-delete" @click="removeParams(scope.row.attr_id)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
@@ -57,31 +57,49 @@
           <el-table-column type="index"></el-table-column>
           <el-table-column label="参数名称" prop="attr_name"></el-table-column>
           <el-table-column label="操作">
-            <template >
+            <template slot-scope="scope">
               <el-button type="primary" size="mini"
-                         icon="el-icon-edit">编辑</el-button>
+                         icon="el-icon-edit" @click="showEdit(scope.row.attr_id)">修改</el-button>
               <el-button type="danger" size="mini"
-                         icon="el-icon-delete">删除</el-button>
+                         icon="el-icon-delete" @click="removeParams(scope.row.attr_id)">删除</el-button>
             </template>
           </el-table-column>
         </el-table>
       </el-tab-pane>
     </el-tabs>
   </el-card>
+
 <!--  添加参数的对话框-->
   <el-dialog
     :title="'添加'+titleText"
     :visible.sync="addDialogVisible"
-    width="30%">
+    width="30%" @close="addDialogClose">
       <el-form :model="addForm" :rules="addFormRules" ref="addFormRef" label-width="100px">
         <el-form-item :label="titleText" prop="attr_name">
           <el-input v-model="addForm.attr_name"></el-input>
         </el-form-item>
-
       </el-form>
+
     <span slot="footer" class="dialog-footer">
     <el-button @click="addDialogVisible = false">取 消</el-button>
-    <el-button type="primary" @click="addDialogVisible = false">确 定</el-button>
+    <el-button type="primary" @click="addParams()">确 定</el-button>
+    </span>
+  </el-dialog>
+
+  <!--  修改参数的对话框-->
+  <el-dialog
+    :title="'修改'+titleText"
+    :visible.sync="editDialogVisible"
+    width="30%" >
+    <el-form :model="editForm" :rules="editFormRules" ref="editFormRef" label-width="100px">
+      <el-form-item :label="titleText" prop="attr_name">
+        <el-input v-model="editForm.attr_name"></el-input>
+      </el-form-item>
+    </el-form>
+
+    <span slot="footer" class="dialog-footer">
+    <el-button @click="editDialogVisible = false">取 消</el-button>
+    <el-button type="primary" @click="editParams()">确 定</el-button>
   </span>
   </el-dialog>
 
@@ -94,7 +112,7 @@ export default {
   data(){
     return{
       cateList:[],
-      //级联选择框双向绑定道德数组
+      //级联选择框双向绑定到的数组
       selectedKeys:[],
       //父级节点的数据
       parentCateList:[],
@@ -119,9 +137,17 @@ export default {
         attr_name:[
           {required:true,message:'请输入分类参数',trigger:'blur'},
         ]
+      },
+      //修改参数的表单
+      editForm:[],
+      editDialogVisible : false,
+      //添加表单的验证规则对象
+      editFormRules:{
+        attr_name:[
+          {required:true,message:'请输入分类参数',trigger:'blur'},
+        ]
+      },
 
-
-      }
     }
   },
   created () {
@@ -131,7 +157,7 @@ export default {
     //获取商品数据
     async  getCateList () {
         const {data:res} =await this.$http.get('categories')
-      if(res.meta.status !== 200){
+        if(res.meta.status !== 200){
         return this.$message.error('获取商品分类失败!')
       }
       this.cateList = res.data
@@ -159,12 +185,88 @@ export default {
       if(res.meta.status !== 200){
         return  this.$message.error('获取参数列表失败!')
       }
+      res.data.forEach(item => {
+        item.attr_vals = item.attr_vals.split(' ')
+      })
+      console.log(res.data)
       if(this.activeName === 'many'){
         this.manyTableData = res.data
         console.log(this.manyTableData)
       }else{
         this.onlyTableData = res.data
       }
+    },
+    //关闭添加属性的对话框
+    addDialogClose(){
+      this.addDialogVisible = false
+      this.$refs.addFormRef.resetFields()
+    },
+    //完成添加分类的操作
+    async  addParams(){
+       this.$refs.addFormRef.validate(async valid=>{
+          if(!valid)
+            return
+          const {data : res} =await this.$http.post(`categories/${this.cateId}/attributes`,{
+            attr_name:this.addForm.attr_name,
+            attr_sel:this.activeName
+          })
+          if(res.meta.status !== 201){
+            return this.$message.error('添加参数失败!')
+          }
+
+            this.$message.success('添加参数成功!')
+            this.addDialogVisible = false
+            await this.getParamsData()
+        })
+
+    },
+    //点击按钮，展示修改参数的对话框
+    async showEdit(attr_id){
+      this.editDialogVisible = true
+      //查询当前参数的信息
+     const {data : res} = await this.$http.get(`categories/${this.cateId}/attributes/${attr_id}`,{
+        params:{ attr_sel :this.activeName}
+      })
+      if(res.meta.status !== 200)
+        return this.$message.error('获取参数信息失败!')
+      this.editForm = res.data
+      console.log(this.editForm)
+    },
+    async editParams(){
+      this.$refs.editFormRef.validate(async valid=>{
+        if(!valid)
+          return
+        const {data : res} = await  this.$http.put(`categories/${this.cateId}/attributes/${this.editForm.attr_id}`,
+          {attr_name:this.editForm.attr_name,attr_sel:this.activeName})
+        if(res.meta.status !== 200)
+          return this.$message.error('修改参数失败!')
+
+        this.$message.success('修改参数成功!')
+        await this.getParamsData()
+        this.editDialogVisible = false
+
+
+      })
+    },
+    async removeParams(attr_id){
+      const  confirmResult =await this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).catch(err => err)
+
+      console.log(confirmResult)
+      if(confirmResult !== 'confirm'){
+        return this.$message.info('已取消删除!')
+      }
+      const {data : res} =await this.$http.delete(`categories/${this.cateId}/attributes/${attr_id}`)
+      console.log(res.data)
+      if(res.meta.status !== 200)
+        return this.$message.error('删除参数失败!')
+
+       this.$message.success('删除参数成功!')
+       await this.getParamsData()
+
     }
   },
   computed:{
