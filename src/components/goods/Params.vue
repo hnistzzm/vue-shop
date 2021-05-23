@@ -33,7 +33,24 @@
 <!--        动态参数表格-->
         <el-table :data="manyTableData"  border stripe>
 <!--          展开行-->
-          <el-table-column type="expand"></el-table-column>
+          <el-table-column type="expand">
+            <template slot-scope="scope">
+              <el-tag v-for="(item,i) in scope.row.attr_vals"
+                      :key="i" closable>{{item}}</el-tag>
+              <el-input
+                class="input-new-tag"
+                v-if="scope.row.inputVisible"
+                v-model="scope.row.inputValue"
+                ref="saveTagInput"
+                size="small"
+                @keyup.enter.native="handleInputConfirm(scope.row)"
+                @blur="handleInputConfirm(scope.row)"
+              >
+              </el-input>
+              <el-button v-else class="button-new-tag" size="small"
+                         @click="showInput(scope.row)">+ New Tag</el-button>
+            </template>
+          </el-table-column>
 <!--          索引列-->
           <el-table-column type="index"></el-table-column>
           <el-table-column label="参数名称" prop="attr_name"></el-table-column>
@@ -48,7 +65,8 @@
         </el-table>
       </el-tab-pane>
       <el-tab-pane label="静态属性" name="only">
-        <el-button type="primary" :disabled="isBtnDisabled"  @click="addDialogVisible  = true">添加参数</el-button>
+        <el-button type="primary" :disabled="isBtnDisabled"
+                   @click="addDialogVisible  = true">添加参数</el-button>
         <!--        动态参数表格-->
         <el-table :data="onlyTableData"  border stripe>
           <!--          展开行-->
@@ -147,6 +165,10 @@ export default {
           {required:true,message:'请输入分类参数',trigger:'blur'},
         ]
       },
+      //控制按钮与文本框的切换显示
+      inputVisible:false,
+      //文本框中输入的内容
+      inputValue:''
 
     }
   },
@@ -186,7 +208,12 @@ export default {
         return  this.$message.error('获取参数列表失败!')
       }
       res.data.forEach(item => {
-        item.attr_vals = item.attr_vals.split(' ')
+        item.attr_vals = item.attr_vals ?
+        item.attr_vals.split(' ') : []
+        //控制文本框的显示与隐藏
+        item.inputVisible = false
+        //文本框中输入的值
+        item.inputValue = ''
       })
       console.log(res.data)
       if(this.activeName === 'many'){
@@ -267,6 +294,27 @@ export default {
        this.$message.success('删除参数成功!')
        await this.getParamsData()
 
+    },
+    //文本框失去焦点或者按下了enter键都会触发
+    handleInputConfirm(row){
+      //如果输入不合法
+      if(row.inputValue.trim().length === 0){
+        row.inputValue = ''
+        row.inputVisible= false
+        return
+      }
+      //否则
+
+
+    },
+    //点击按钮，展示文本输出框
+    showInput(row){
+      row.inputVisible = true
+      //让文本框自动获得焦点
+      //$nextTick 方法的作用，就是当页面上元素被重新渲染之后，才会指定回调函数中的代码
+      this.$nextTick(_ => {
+        this.$refs.saveTagInput.$refs.input.focus();
+      });
     }
   },
   computed:{
@@ -296,5 +344,11 @@ export default {
 <style  Lang="less" scoped>
 .cat{
   margin: 15px 10px;
+}
+.el-tag{
+  margin-right: 10px;
+}
+.input-new-tag{
+  width: 70px;
 }
 </style>
