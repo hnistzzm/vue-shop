@@ -36,7 +36,7 @@
           <el-table-column type="expand">
             <template slot-scope="scope">
               <el-tag v-for="(item,i) in scope.row.attr_vals"
-                      :key="i" closable>{{item}}</el-tag>
+                      :key="i" closable @close="handleClose(i,scope.row)">{{item}}</el-tag>
               <el-input
                 class="input-new-tag"
                 v-if="scope.row.inputVisible"
@@ -70,7 +70,24 @@
         <!--        动态参数表格-->
         <el-table :data="onlyTableData"  border stripe>
           <!--          展开行-->
-          <el-table-column type="expand"></el-table-column>
+          <el-table-column type="expand">
+            <template slot-scope="scope">
+              <el-tag v-for="(item,i) in scope.row.attr_vals"
+                      :key="i" closable @close="handleClose(i,scope.row)">{{item}}</el-tag>
+              <el-input
+                class="input-new-tag"
+                v-if="scope.row.inputVisible"
+                v-model="scope.row.inputValue"
+                ref="saveTagInput"
+                size="small"
+                @keyup.enter.native="handleInputConfirm(scope.row)"
+                @blur="handleInputConfirm(scope.row)"
+              >
+              </el-input>
+              <el-button v-else class="button-new-tag" size="small"
+                         @click="showInput(scope.row)">+ New Tag</el-button>
+            </template>
+          </el-table-column>
           <!--          索引列-->
           <el-table-column type="index"></el-table-column>
           <el-table-column label="参数名称" prop="attr_name"></el-table-column>
@@ -197,6 +214,8 @@ export default {
       //证明选中的不是三级分类
       if(this.selectedKeys.length !==3){
         this.selectedKeys = []
+        this.manyTableData =  []
+        this.onlyTableData = []
         return
       }
       console.log(this.selectedKeys)
@@ -295,8 +314,25 @@ export default {
        await this.getParamsData()
 
     },
+    //将对 attr_vals的操作保存到数据库
+    async saveAttrVals(row){
+      //发起请求，保存这次操作
+      const {data : res}=await this.$http.put(`categories/${this.cateId}/attributes/${row.attr_id}`
+        ,{
+          attr_name : row.attr_name,
+          attr_sel : row.attr_sel,
+          attr_vals: row.attr_vals.join(' ')
+        })
+      if(res.meta.status !== 200){
+        return this.$message.error('修改参数相失败!')
+
+      }else{
+        return this.$message.success('修改参数项成功!')
+      }
+
+    },
     //文本框失去焦点或者按下了enter键都会触发
-    handleInputConfirm(row){
+    async handleInputConfirm(row){
       //如果输入不合法
       if(row.inputValue.trim().length === 0){
         row.inputValue = ''
@@ -304,6 +340,10 @@ export default {
         return
       }
       //否则
+      row.attr_vals.push(row.inputValue.trim())
+      row.inputValue=''
+      row.inputVisible = false
+      await this.saveAttrVals(row)
 
 
     },
@@ -315,8 +355,13 @@ export default {
       this.$nextTick(_ => {
         this.$refs.saveTagInput.$refs.input.focus();
       });
+    },
+    handleClose(i,row){
+      row.attr_vals.splice(i,1)
+      this.saveAttrVals(row)
     }
   },
+
   computed:{
     isBtnDisabled(){
       if(this.selectedKeys.length !==3)

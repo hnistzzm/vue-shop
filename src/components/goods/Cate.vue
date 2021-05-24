@@ -186,7 +186,7 @@ export default {
         if(res.meta.status !== 200)
           return this.$message.error('获取商品分类失败!')
 
-      //console.log(res.data)
+      console.log(res.data)
         //把数据列表赋值给cateList
         this.cateList = res.data.result
       console.log(this.cateList)
